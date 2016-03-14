@@ -54,6 +54,18 @@
 		animate(pixel_x = ipx, pixel_y = ipy, time = 0.6,easing = EASE_IN)
 		animate(transform = turn(matrix(), 0), time = 0.6, easing = EASE_IN)
 
+/proc/eat_twitch(var/atom/A)
+	var/matrix/squish_matrix = matrix()
+	squish_matrix.Scale(1,0.92)
+	var/matrix/M = matrix()
+	squish_matrix.Scale(1,1)
+	var/ipy = A.pixel_y
+
+	animate(A, transform = squish_matrix, time = 1,easing = EASE_OUT)
+	animate(pixel_y = -1, time = 1,easing = EASE_OUT)
+	animate(transform = M, time = 1, easing = EASE_IN)
+	animate(pixel_y = ipy, time = 1,easing = EASE_IN)
+
 /proc/animate_float(var/atom/A, var/loopnum = -1, floatspeed = 20, random_side = 1)
 	if (!istype(A))
 		return

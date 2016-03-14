@@ -222,6 +222,7 @@
 
 
 	proc/on_bite(mob/eater)
+		eat_twitch(eater)
 		return
 
 	proc/on_finish(mob/eater)
@@ -318,6 +319,7 @@
 
 			playsound(M.loc,"sound/items/drink.ogg", rand(10,50), 1)
 			M.urine += 0.1
+			eat_twitch(M)
 
 			return 1
 
