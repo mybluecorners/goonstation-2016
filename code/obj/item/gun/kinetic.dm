@@ -437,6 +437,7 @@
 	caliber = 0.22
 	max_ammo_capacity = 10
 	auto_eject = 1
+	hide_attack = 1
 
 	New()
 		ammo = new/obj/item/ammo/bullets/bullet_22

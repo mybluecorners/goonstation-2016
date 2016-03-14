@@ -29,6 +29,7 @@
 	var/max_stack = 1
 	var/stack_type = null // if null, only current type. otherwise uses this
 	var/contraband = 0 //If nonzero, bots consider this a thing people shouldn't be carrying without authorization
+	var/hide_attack = 0 //If zero, using this item as a weapon will play the attack animation. Used for hiding attacks with silenced .22 and sleepy pen
 
 	var/image/wear_image = null
 	var/wear_image_icon = 'icons/mob/belt.dmi'

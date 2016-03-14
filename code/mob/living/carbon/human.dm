@@ -2931,7 +2931,8 @@
 				boutput(M, "<span style=\"color:red\">You cannot harm your master!</span>")
 				return
 
-			attack_twitch(M)
+			if (M != src)
+				attack_twitch(M)
 			M.violate_hippocratic_oath()
 			message_admin_on_attack(M, "punches")
 			if (src.shrunk == 2)

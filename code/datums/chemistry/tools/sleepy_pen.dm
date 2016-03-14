@@ -1,6 +1,7 @@
 /obj/item/pen/sleepypen
 	desc = "It's a normal black ink pen with a sharp point."
 	flags = FPRINT | ONBELT | TABLEPASS | NOSPLASH | OPENCONTAINER
+	hide_attack = 1
 
 	New()
 		..()
