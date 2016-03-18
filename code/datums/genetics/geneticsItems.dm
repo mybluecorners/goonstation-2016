@@ -144,6 +144,7 @@
 	icon_state = "screwdriver"
 	flags = FPRINT | TABLEPASS | CONDUCT
 	w_class = 0
+	hide_attack = 1
 	var/obj/item/genetics_injector/dna_injector/payload = null
 
 	attack_self(var/mob/user as mob)
