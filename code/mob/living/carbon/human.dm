@@ -5283,10 +5283,7 @@
 
 	if (message_range)
 		var/heardname = src.real_name
-		for (var/atom/A in view(message_range, src))
-			spawn (0)
-				if (A)
-					A.hear_talk(src, messages, heardname, lang_id)
+		src.send_hear_talks(message_range, messages, heardname, lang_id)
 
 		var/list/listening = all_hearers(message_range, src)
 		eavesdropping -= listening

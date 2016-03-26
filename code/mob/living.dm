@@ -624,10 +624,9 @@
 			italics = 1
 
 	var/heardname = src.real_name
-	for (var/atom/A in all_view(message_range, src))
-		spawn (0)
-			if (!skip_open_mics_in_range && A)
-				A.hear_talk(src, messages, heardname, lang_id)
+
+	if (!skip_open_mics_in_range)
+		src.send_hear_talks(message_range, messages, heardname, lang_id)
 
 	var/list/listening = list()
 	var/list/olocs = list()
@@ -701,6 +700,21 @@
 				M.show_message(thisR, 2)
 
 // helper proooocs
+
+/mob/proc/send_hear_talks(var/message_range, var/messages, var/heardname, var/lang_id)	//helper to send hear_talk to all mob, obj, and turf
+	var/list/search_view = all_view(message_range, src)
+	for (var/obj/O in search_view)
+		spawn (0)
+			if (O)
+				O.hear_talk(src, messages, heardname, lang_id)
+	for (var/mob/M in search_view)
+		spawn (0)
+			if (M)
+				M.hear_talk(src, messages, heardname, lang_id)
+	for (var/turf/T in search_view)
+		spawn (0)
+			if (T)
+				T.hear_talk(src, messages, heardname, lang_id)
 
 /mob/proc/get_heard_name()
 	return "<span class='name' data-ctx='\ref[src.mind]'>[src.name]</span>"
