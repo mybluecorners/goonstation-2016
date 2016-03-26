@@ -1204,7 +1204,11 @@ var/list/hasvar_type_cache = list()
 // Marquesas: added an extra parameter to fix issue with changeling.
 // Unfortunately, it has to be this extra parameter, otherwise the spawn(0) in the mob say will
 // cause the mob's name to revert from the one it acquired for mimic voice.
-/obj/proc/hear_talk(mob/M as mob, text, real_name)
+/atom/proc/hear_talk(mob/M as mob, text, real_name)
+	if (src.open_to_sound)
+		for(var/obj/O in src)
+			O.hear_talk(M,text,real_name)
+
 	/*var/mob/mo = locate(/mob) in src
 	if(mo)
 		var/heardname = M.name

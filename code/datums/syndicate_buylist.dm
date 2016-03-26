@@ -172,6 +172,12 @@ proc/build_syndi_buylist_cache()
 	cost = 7
 	desc = "A haunted antique wrestling belt, imbued with the spirits of wrestlers past. Wearing it unlocks a number of wrestling moves, which can be accessed in a separate command tab."
 
+/datum/syndicate_buylist/generic/spy_sticker_kit
+	name = "Spy Sticker Kit"
+	item = /obj/item/storage/box/spy_sticker_kit
+	cost = 2
+	desc = "This kit contains innocuous stickers that you can use to broadcast audio and observe a video feed wirelessly."
+
 //////////////////////////////////////////////////// Standard items (traitor uplink) ///////////////////////////////////
 
 /datum/syndicate_buylist/traitor

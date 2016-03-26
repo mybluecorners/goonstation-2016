@@ -624,10 +624,10 @@
 			italics = 1
 
 	var/heardname = src.real_name
-	for (var/obj/O in all_view(message_range, src))
+	for (var/atom/A in all_view(message_range, src))
 		spawn (0)
-			if (!skip_open_mics_in_range && O)
-				O.hear_talk(src, messages, heardname, lang_id)
+			if (!skip_open_mics_in_range && A)
+				A.hear_talk(src, messages, heardname, lang_id)
 
 	var/list/listening = list()
 	var/list/olocs = list()

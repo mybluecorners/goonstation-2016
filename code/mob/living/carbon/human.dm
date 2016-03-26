@@ -3591,6 +3591,11 @@
 			else if (src.burning > 66)
 				damage = max(5-damage_reduction,2.00)
 
+			if (src.burning > 33)
+				for(var/obj/item/sticker/S in src.contents)
+					if (S.active)
+						qdel(S)
+
 			if (isturf(src.loc))
 				var/turf/location = src.loc
 				location.hotspot_expose(T0C + 100 + src.burning * 3, 400)
@@ -5278,10 +5283,10 @@
 
 	if (message_range)
 		var/heardname = src.real_name
-		for (var/obj/O in view(message_range, src))
+		for (var/atom/A in view(message_range, src))
 			spawn (0)
-				if (O)
-					O.hear_talk(src, messages, heardname, lang_id)
+				if (A)
+					A.hear_talk(src, messages, heardname, lang_id)
 
 		var/list/listening = all_hearers(message_range, src)
 		eavesdropping -= listening

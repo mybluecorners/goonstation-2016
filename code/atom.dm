@@ -96,6 +96,7 @@
 	var/shrunk = 0
 	var/area/last_area = null
 	var/texture_size = 0  //Override for the texture size used by setTexture.
+	var/open_to_sound = 0	//If hear_talk is triggered on this object, make my contents hear_talk as well
 
 /* -------------------- name stuff -------------------- */
 	/*

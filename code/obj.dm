@@ -227,6 +227,12 @@
 			src.attack_hand(M)
 	AutoUpdateAI(src)
 
+/obj/item/proc/updateSelfDialogFromTurf()	//It's weird, yes. only used for spy stickers as of now
+	var/list/nearby = viewers(1, get_turf(src))
+	for(var/mob/M in nearby)
+		if ((M.client && M.machine == src))
+			src.attack_self(M)
+
 /obj/item/proc/updateSelfDialog()
 	var/mob/M = src.loc
 	if(istype(M) && M.client && M.machine == src)

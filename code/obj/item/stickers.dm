@@ -8,6 +8,9 @@
 	w_class = 1.0
 	force = 0
 	throwforce = 0
+	var/active = 0
+	var/overlay_key
+	var/atom/attached
 	var/list/random_icons = list()
 
 	New()
@@ -39,8 +42,23 @@
 		//poy = minmax(-round(A.bound_height/2), pox, round(A.bound_height/2))
 		sticker.pixel_x = pox
 		sticker.pixel_y = poy
-		A.UpdateOverlays(sticker, "sticker[world.timeofday]")
-		qdel(src)
+		overlay_key = "sticker[world.timeofday]"
+		attached = A
+		A.UpdateOverlays(sticker, overlay_key)
+		//	qdel(src) //Don't delete stickers when applied - remove them later through fire!
+		src.active = 1
+		user.u_equip(src)
+		src.loc = A
+		src.invisibility = 101
+
+	temperature_expose(datum/gas_mixture/air, temperature, volume)
+		if((temperature > T0C+100) && active)
+			qdel(src)
+
+	dispose()
+		if (active)
+			attached.ClearSpecificOverlays(overlay_key)
+		attached.visible_message("<span style=\"color:red\"><b>[src]</b> burns to a crisp!</span>")
 
 	attack()
 		return
@@ -149,3 +167,75 @@
 		name = "participation ribbon"
 		desc = "You showed up, which is really the hardest part. With accreditations like this award ribbon, you've proven you can do anything."
 		placement = "Participant"
+
+/obj/item/sticker/spy
+	name = "gold star sticker"
+	icon_state = "gold_star"
+	desc = "This sticker contains a tiny radio transmitter that handles audio and video. Use this in your hand before placing it to set up the broadcast frequency."
+	open_to_sound = 1
+	var/obj/machinery/camera/camera = null
+	var/obj/item/device/radio/spy/radio = null
+	var/camera_tag = "sticker"
+	var/camera_network = "stickers"
+
+	New()
+		..()
+		var/obj/S = pick("gold_star", "banana", "heart","clover", "skull", "smile")
+		src.icon_state = S
+		src.name = "[S] sticker"
+
+		src.camera = new /obj/machinery/camera (src)
+		src.camera.c_tag = src.camera_tag
+		src.camera.network = src.camera_network
+		src.camera.status = 0
+		src.camera_tag = src.name
+
+		src.radio = new /obj/item/device/radio/spy (src)
+		spawn(1)
+			src.radio.broadcasting = 0
+			src.radio.listening = 0
+
+	dispose()
+		if ((active) && (attached != null))
+			attached.open_to_sound = 0
+		qdel(src.camera)
+		qdel(src.radio)
+		..()
+
+	afterattack(var/atom/A as mob|obj|turf, var/mob/user as mob, reach, params)
+		src.camera.c_tag = "[src.camera_tag] ([A.name])"
+		src.camera.status = 1.0
+		src.radio.invisibility = 101
+		logTheThing("combat", user, A, "places a spy sticker on %target% at [log_loc(user)].")
+
+		..()
+
+		if (istype(A, /turf/simulated/wall) || istype(A, /turf/unsimulated/wall))
+			src.loc = get_turf(user)	//If sticking to a wall, just set the loc to the user loc. Otherwise the spycam would be able to see through walls.
+		else
+			src.loc = A
+		src.loc.open_to_sound = 1
+
+
+	attack_self(mob/user as mob)
+		src.radio.attack_self(user)
+		..()
+
+/obj/item/device/camera_viewer/sticker
+	name = "Camera monitor"
+	desc = "A portable video monitor connected to a network of spy cameras."
+	icon_state = "monitor"
+	item_state = "electronic"
+	w_class = 2.0
+	network = "stickers"
+
+/obj/item/storage/box/spy_sticker_kit
+	name = "spy sticker kit"
+	desc = "Includes everything you need to spy on your unsuspecting co-workers!"
+	spawn_contents = list(/obj/item/sticker/spy = 5,\
+	/obj/item/device/camera_viewer/sticker,\
+	/obj/item/device/radio/headset)
+
+/obj/item/device/radio/spy
+	name = "spy radio"
+	desc = "Spy radio housed in a sticker. Wait, how are you reading this?"

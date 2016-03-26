@@ -120,7 +120,9 @@ Frequency:
 	//..()
 	if (usr.stat)
 		return
-	if ((istype(usr, /mob/living/silicon)) || (src in usr) || (istype(src, /obj/item/device/radio/intercom) && (get_dist(src, usr) <= 1) && (istype(src.loc, /turf))) || (usr.loc == src.loc)) // Band-aid fix for intercoms, RE 'bounds_dist' check in the 'in_range' proc. Feel free to improve the implementation (Convair880).
+
+	var/special_cases =((istype(src, /obj/item/device/radio/intercom) && (get_dist(src, usr) <= 1) && (istype(src.loc, /turf))) || (istype(src, /obj/item/device/radio/spy) && (get_dist(src, usr) <= 1)))// Band-aid fix for intercoms, RE 'bounds_dist' check in the 'in_range' proc. Feel free to improve the implementation (Convair880).
+	if ((istype(usr, /mob/living/silicon)) || (src in usr) || (special_cases) || (usr.loc == src.loc))
 		usr.machine = src
 		if (href_list["track"])
 			var/mob/target = locate(href_list["track"])
@@ -179,6 +181,8 @@ Frequency:
 				return
 
 */
+		if (istype(src, /obj/item/device/radio/spy))
+			src.updateSelfDialogFromTurf() //radio is inside of another object, use turf
 
 		if (!( src.master ))
 			if (istype(src.loc, /mob))
@@ -193,6 +197,7 @@ Frequency:
 				src.attack_self(src.master.loc)
 			else
 				src.updateDialog()
+
 		src.add_fingerprint(usr)
 	else
 		usr << browse(null, "window=radio")
