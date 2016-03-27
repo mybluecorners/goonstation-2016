@@ -180,9 +180,11 @@
 
 	New()
 		..()
-		var/obj/S = pick("gold_star", "banana", "heart","clover", "skull", "smile")
+		var/obj/S = pick("gold_star", "banana", "heart","clover", "skull", "smile", "rainbow")
 		src.icon_state = S
 		src.name = "[S] sticker"
+		if (S == "gold_star")	//no underscore in name thanks
+			src.name = "gold star sticker"
 
 		src.camera = new /obj/machinery/camera (src)
 		src.camera.c_tag = src.camera_tag
