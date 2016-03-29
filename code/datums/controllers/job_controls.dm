@@ -85,7 +85,11 @@ var/datum/job_controller/job_controls
 		dat += "<A href='?src=\ref[src];EditName=1'>Job Name:</A> [src.job_creator.name]<br>"
 		dat += "<A href='?src=\ref[src];EditWages=1'>Wages Per Payday:</A> [src.job_creator.wages]<br>"
 		dat += "<A href='?src=\ref[src];EditLimit=1'>Job Limit:</A> [src.job_creator.limit]<br>"
+		dat += "<A href='?src=\ref[src];ChangeName=1'>Can Change Name on Spawn:</A> [src.job_creator.change_name_on_spawn ? "Yes":"No"]<br>"
+		dat += "<A href='?src=\ref[src];SetSpawnLoc=1'>Special Spawn Location:</A> [src.job_creator.special_spawn_location]<br>"
+		dat += "<A href='?src=\ref[src];EditObjective=1'>Custom Objective:</A> [src.job_creator.objective]<br>"
 		dat += "<A href='?src=\ref[src];EditMob=1'>Mob Type:</A> [src.job_creator.mob_type]<br>"
+		dat += "<BR><b>Equipment:</b>"
 		if (ispath(src.job_creator.mob_type, /mob/living/carbon/human))
 			dat += "<A href='?src=\ref[src];EditHeadgear=1'>Starting Headgear:</A> [src.job_creator.slot_head]<br>"
 			dat += "<A href='?src=\ref[src];EditMask=1'>Starting Mask:</A>  [src.job_creator.slot_mask]<br>"
@@ -102,9 +106,14 @@ var/datum/job_controller/job_controls
 			dat += "<A href='?src=\ref[src];EditPock2=1'>Starting 2nd Pocket Item:</A> [src.job_creator.slot_poc2]<br>"
 			dat += "<A href='?src=\ref[src];EditLhand=1'>Starting Left Hand Item:</A> [src.job_creator.slot_lhan]<br>"
 			dat += "<A href='?src=\ref[src];EditRhand=1'>Starting Right Hand Item:</A> [src.job_creator.slot_rhan]<br>"
-			dat += "<A href='?src=\ref[src];GetAccess=1'>Access Permissions:</A><br>"
+			dat += "<A href='?src=\ref[src];GetAccess=1'>Set Access Permissions </A>"
+			if (src.job_creator.access.len > 1)
+				dat += "<A href='?src=\ref[src];AddAccess=1'>(Add More):</A>"
+			dat += ":<BR>"
 			for(var/X in src.job_creator.access)
 				dat += "[X], "
+			dat += "<BR>"
+			dat += "<A href='?src=\ref[src];BioEffects=1'>Bio Effects:</A> [src.job_creator.bio_effects]<br>"
 		dat += "<BR>"
 		dat += "<A href='?src=\ref[src];CreateJob=1'><b>Create Job</b></A>"
 		dat += "</body></html>"
@@ -638,6 +647,57 @@ var/datum/job_controller/job_controls
 			src.job_creator.access = get_access(picker)
 			src.job_creator()
 
+		if(href_list["AddAccess"])
+			var/picker = input("Make this job's access comparable to which job?","Job Creator") in list("Captain","Head of Security",
+			"Head of Personnel","Chief Engineer","Research Director","Security Officer","Detective","Geneticist","Roboticist","Scientist",
+			"Medical Doctor","Quartermaster","Miner","Mechanic","Engineer","Chef","Barman","Botanist","Janitor","Chaplain","Staff Assistant","No Access")
+			src.job_creator.access |= get_access(picker)
+			src.job_creator()
+
+		if(href_list["BioEffects"])
+			switch(alert("Clear or reselect bioeffects?","Job Creator","Clear","Reselect"))
+				if("Clear")
+					src.job_creator.bio_effects = null
+				if("Reselect")
+					var/pick = input("Which effect(s)? Enter IDs - seperate using semicolons.","["Give"] Bioeffects") as null|text
+					if (!pick)
+						src.job_creator.bio_effects = null
+					else
+						src.job_creator.bio_effects = pick
+			src.job_creator()
+
+		if(href_list["EditObjective"])
+			switch(alert("Clear or redefine objective?","Job Creator","Clear","Redefine"))
+				if("Clear")
+					src.job_creator.objective = null
+				if("Redefine")
+					var/input = input("Enter a custom objective.","Enter Objective") as null|text
+					src.job_creator.objective = input
+					switch(alert("Is Miscreant?","Job Creator","Yeah","Nope"))
+						if("Yeah")
+							src.job_creator.spawn_miscreant = 1
+						if("Nope")
+							src.job_creator.spawn_miscreant = 0
+			src.job_creator()
+
+		if(href_list["ChangeName"])
+			if (src.job_creator.change_name_on_spawn == 0)
+				src.job_creator.change_name_on_spawn = 1
+			else
+				src.job_creator.change_name_on_spawn = 0
+			src.job_creator()
+
+		if(href_list["SetSpawnLoc"])
+			switch(alert("Clear or reselect spawn location?","Job Creator","Clear","Reselect"))
+				if("Clear")
+					src.job_creator.special_spawn_location = null
+				if("Reselect")
+					alert("Please move to the target location and then press OK.")
+					var/atom/trg = get_turf(usr)
+					if(trg)
+						src.job_creator.special_spawn_location = trg
+			src.job_creator()
+
 		if(href_list["CreateJob"])
 			var/datum/job/match_check = find_job_in_controller_by_string(src.job_creator.name)
 			if (match_check)
@@ -666,6 +726,11 @@ var/datum/job_controller/job_controls
 				JOB.slot_lhan = src.job_creator.slot_lhan
 				JOB.slot_rhan = src.job_creator.slot_rhan
 				JOB.access = JOB.access | src.job_creator.access
+				JOB.change_name_on_spawn = src.job_creator.change_name_on_spawn
+				JOB.special_spawn_location = src.job_creator.special_spawn_location
+				JOB.bio_effects = src.job_creator.bio_effects
+				JOB.objective = src.job_creator.objective
+				JOB.spawn_miscreant = src.job_creator.spawn_miscreant
 				message_admins("Admin [key_name(usr)] created special job [JOB.name]")
 				logTheThing("admin", usr, null, "created special job [JOB.name]")
 				logTheThing("diary", usr, null, "created special job [JOB.name]", "admin")

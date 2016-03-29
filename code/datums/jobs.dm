@@ -36,8 +36,11 @@
 	var/list/items_in_belt = list() // works the same as above but is for jobs that spawn with a belt that can hold things
 	var/list/access = list(access_fuck_all) // Please define in global get_access() proc (access.dm), so it can also be used by bots etc.
 	var/mob/living/mob_type = /mob/living/carbon/human
-
 	var/change_name_on_spawn = 0
+	var/special_spawn_location = null
+	var/bio_effects = null
+	var/objective = null
+	var/spawn_miscreant = 0
 
 	New()
 		..()
@@ -51,8 +54,33 @@
 			M.verbs += /mob/proc/add_miranda
 			if (!isnull(M.mind))
 				M.mind.miranda = "You have the right to remain silent. Anything you say can and will be used against you in a NanoTrasen court of Space Law. You have the right to a rent-an-attorney. If you cannot afford one, a monkey in a suit and funny hat will be appointed to you."
-		if (src.change_name_on_spawn)
-			spawn(0)
+
+		spawn(0)
+			if (src.special_spawn_location)
+				M.loc = src.special_spawn_location
+
+			if (src.bio_effects)
+				var/list/picklist = params2list(src.bio_effects)
+				if (picklist && picklist.len >= 1)
+					for(var/pick in picklist)
+						M.bioHolder.AddEffect(pick)
+
+			if (src.objective)
+				var/datum/objective/newObjective = spawn_miscreant ? new /datum/objective/miscreant : new /datum/objective/crew
+				newObjective.explanation_text = src.objective
+				newObjective.owner = M.mind
+				M.mind.objectives += newObjective
+				if (spawn_miscreant)
+					boutput(M, "<B>You are a miscreant!</B>")
+					boutput(M, "You should try to complete your objectives, but don't commit any traitorous acts.")
+					boutput(M, "Your objective is as follows:")
+					boutput(M, "[newObjective.explanation_text]")
+					miscreants += M.mind
+				else
+					boutput(M, "<B>Your OPTIONAL Crew Objectives are as follows:</b>")
+					boutput(M, "<B>Objective #1</B>: [newObjective.explanation_text]")
+
+			if (src.change_name_on_spawn)
 				M.choose_name(3, src.name, M.real_name + " the " + src.name)
 
 // Command Jobs
