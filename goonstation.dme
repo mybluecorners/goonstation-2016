@@ -311,6 +311,7 @@ var/datum/preMapLoad/preMapLoad = new
 #include "code\datums\chemistry\tools\vendor_items.dm"
 #include "code\datums\controllers\action_controls.dm"
 #include "code\datums\controllers\artifact_controls.dm"
+#include "code\datums\controllers\custom_job_savefile.dm"
 #include "code\datums\controllers\disease_controls.dm"
 #include "code\datums\controllers\event_controls.dm"
 #include "code\datums\controllers\hydro_controls.dm"
