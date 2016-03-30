@@ -16,6 +16,8 @@
 #define SAVEFILE_VERSION_MAX	7
 #define SAVEFILE_PROFILES_MAX	3
 
+#define CUSTOMJOB_SAVEFILE_PROFILES_MAX	6
+
 //Action defines
 #define INTERRUPT_ALWAYS -1 //Internal flag that will always interrupt any action.
 #define INTERRUPT_MOVE 1 //Interrupted when object moves
