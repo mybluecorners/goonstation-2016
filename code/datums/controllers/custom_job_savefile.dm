@@ -17,10 +17,22 @@ datum/job_controller/proc/savefile_unlock(client/user)
 		var/savefile/F = new /savefile(src.savefile_path(user), -1)
 		F.Unlock()
 
+datum/job_controller/proc/savefile_version_pass(client/user)
+	var/version = null
+	var/savefile/F = new /savefile(src.savefile_path(user), -1)
+	F["version"] >> version
+
+	if (isnull(version) || version < CUSTOMJOB_SAVEFILE_VERSION_MIN || version > CUSTOMJOB_SAVEFILE_VERSION_MAX)
+		src.savefile_delete(user)
+		return 0
+	return 1
+
 datum/job_controller/proc/savefile_save(client/user, profileNum=1)
 	profileNum = max(1, min(profileNum, CUSTOMJOB_SAVEFILE_PROFILES_MAX))
 	var/savefile/F = new /savefile(src.savefile_path(user), -1)
 	F.Lock(-1)
+
+	F["version"] << CUSTOMJOB_SAVEFILE_VERSION_MAX
 
 	F["[profileNum]_saved"] << 1
 	F["[profileNum]_job_name"] << src.job_creator.name
@@ -59,6 +71,9 @@ datum/job_controller/proc/savefile_load(client/user, var/profileNum = 1)
 	profileNum = max(1, min(profileNum, CUSTOMJOB_SAVEFILE_PROFILES_MAX))
 
 	var/savefile/F = new /savefile(path, -1)
+
+	if (!src.savefile_version_pass(user))
+		return 0
 
 	var/sanity_check = null
 	F["[profileNum]_saved"] >> sanity_check
@@ -99,29 +114,6 @@ datum/job_controller/proc/savefile_load(client/user, var/profileNum = 1)
 
 	return 1
 
-datum/job_controller/proc/savefile_get_job_names(client/user)
-	if (!savefile_path_exists(user))
-		return 0
-
-	var/list/names
-
-	for (var/i=1, i <= CUSTOMJOB_SAVEFILE_PROFILES_MAX, i++)
-		var/profileNum = i
-		var/path = savefile_path(user)
-
-		var/savefile/F = new /savefile(path, -1)
-
-		var/job_name = null
-		F["[profileNum]_job_name"] >> job_name
-
-
-		if (isnull(job_name))
-			names += i
-		else
-			names += job_name
-
-	return names
-
 datum/job_controller/proc/savefile_get_job_name(client/user, var/profileNum = 1)
 
 	if (!savefile_path_exists(user))
@@ -131,6 +123,9 @@ datum/job_controller/proc/savefile_get_job_name(client/user, var/profileNum = 1)
 	profileNum = max(1, min(profileNum, CUSTOMJOB_SAVEFILE_PROFILES_MAX))
 
 	var/savefile/F = new /savefile(path, -1)
+
+	if (!src.savefile_version_pass(user))
+		return 0
 
 	var/job_name = null
 	F["[profileNum]_job_name"] >> job_name

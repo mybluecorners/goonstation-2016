@@ -17,6 +17,8 @@
 #define SAVEFILE_PROFILES_MAX	3
 
 #define CUSTOMJOB_SAVEFILE_PROFILES_MAX	6
+#define CUSTOMJOB_SAVEFILE_VERSION_MIN 0
+#define CUSTOMJOB_SAVEFILE_VERSION_MAX 1
 
 //Action defines
 #define INTERRUPT_ALWAYS -1 //Internal flag that will always interrupt any action.
