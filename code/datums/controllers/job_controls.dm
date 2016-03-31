@@ -770,6 +770,7 @@ var/datum/job_controller/job_controls
 				message_admins("Admin [key_name(usr)] created special job [JOB.name]")
 				logTheThing("admin", usr, null, "created special job [JOB.name]")
 				logTheThing("diary", usr, null, "created special job [JOB.name]", "admin")
+
 			src.job_creator()
 
 		if(href_list["Save"])

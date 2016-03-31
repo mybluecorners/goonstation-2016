@@ -21,9 +21,9 @@ datum/job_controller/proc/savefile_version_pass(client/user)
 	var/version = null
 	var/savefile/F = new /savefile(src.savefile_path(user), -1)
 	F["version"] >> version
-
 	if (isnull(version) || version < CUSTOMJOB_SAVEFILE_VERSION_MIN || version > CUSTOMJOB_SAVEFILE_VERSION_MAX)
-		src.savefile_delete(user)
+		if (!src.load_another_ckey)
+			src.savefile_delete(user)
 		return 0
 	return 1
 
@@ -33,7 +33,6 @@ datum/job_controller/proc/savefile_save(client/user, profileNum=1)
 	F.Lock(-1)
 
 	F["version"] << CUSTOMJOB_SAVEFILE_VERSION_MAX
-
 	F["[profileNum]_saved"] << 1
 	F["[profileNum]_job_name"] << src.job_creator.name
 	F["[profileNum]_wages"] << src.job_creator.wages
@@ -64,16 +63,17 @@ datum/job_controller/proc/savefile_save(client/user, profileNum=1)
 	return 1
 
 datum/job_controller/proc/savefile_load(client/user, var/profileNum = 1)
-	var/path = savefile_path(user)
-	if (!fexists(path))
+	if (!savefile_path_exists(user))
 		return 0
+
+	if (!src.savefile_version_pass(user))
+		return 0
+
+	var/path = savefile_path(user)
 
 	profileNum = max(1, min(profileNum, CUSTOMJOB_SAVEFILE_PROFILES_MAX))
 
 	var/savefile/F = new /savefile(path, -1)
-
-	if (!src.savefile_version_pass(user))
-		return 0
 
 	var/sanity_check = null
 	F["[profileNum]_saved"] >> sanity_check
@@ -123,9 +123,6 @@ datum/job_controller/proc/savefile_get_job_name(client/user, var/profileNum = 1)
 	profileNum = max(1, min(profileNum, CUSTOMJOB_SAVEFILE_PROFILES_MAX))
 
 	var/savefile/F = new /savefile(path, -1)
-
-	if (!src.savefile_version_pass(user))
-		return 0
 
 	var/job_name = null
 	F["[profileNum]_job_name"] >> job_name
