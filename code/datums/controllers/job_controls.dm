@@ -84,8 +84,10 @@ var/datum/job_controller/job_controls
 
 	proc/check_user_changed()//Since this is a 'public' window that everyone can get to, make sure we keep the user contained to their own savefile
 		if (last_client != usr.client)
-			last_client = usr.client
-			loaded_save = 0
+			src.savefile_unlock(usr)
+			src.last_client = usr.client
+			src.loaded_save = 0
+			src.load_another_ckey = null
 			return 1
 		return 0
 
@@ -137,7 +139,7 @@ var/datum/job_controller/job_controls
 				dat += "<b> (Showing [src.load_another_ckey]'s jobs)</b>"
 			dat += "<br>"
 			for (var/i=1, i <= CUSTOMJOB_SAVEFILE_PROFILES_MAX, i++)
-				dat += " <a href='?src=\ref[src];Load=[i]'>[src.savefile_get_job_name(usr, i) || i]</a>"
+				dat += " <a href='?src=\ref[src];Load=[i]'>[src.savefile_get_job_name(usr,i) || i]</a>"
 				dat += " "
 				if (!src.load_another_ckey)
 					dat += " <a href='?src=\ref[src];Save=[i]'>(Save here)</a>"
@@ -708,9 +710,9 @@ var/datum/job_controller/job_controls
 					var/input = input("Enter a custom objective.","Enter Objective") as null|text
 					src.job_creator.objective = input
 					switch(alert("Objective type?","Job Creator","Miscreant Objective","Crew Objective"))
-						if("Yeah")
+						if("Miscreant Objective")
 							src.job_creator.spawn_miscreant = 1
-						if("Nope")
+						if("Crew Objective")
 							src.job_creator.spawn_miscreant = 0
 			src.job_creator()
 
